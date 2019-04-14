@@ -112,8 +112,23 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   Serial.print(msg);
 }
 
-bool _csma_channel_idle() {
-  return true;
+bool _csma_channel_idle() { // returns true if the channel is idle
+  if (!HC12.available()) { // if nothing is being received on the HC-12,
+    return true; // then the channel is idle
+  } else { // otherwise, we should accept what is being received and print it to the serial console
+    // duplicated code from above
+    while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+      HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+      if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+        HC12ReadBuffer += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+      }
+      if (HC12ByteIn == '\n') {                   // At the end of the line
+        HC12End = true;                           // Set HC12End flag to true
+      }
+    }
+    Serial.print(HC12ReadBuffer);
+    return false; // then let the calling function know that the channel was busy
+  }
 }
 
 bool _csma_collision() { // returns true if there was a collision
