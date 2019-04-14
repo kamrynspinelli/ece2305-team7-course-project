@@ -20,6 +20,7 @@ const int Tmax = 512;
 // Timer setup
 unsigned long timer = millis();                 // Delay Timer
 
+// Serial communication variables
 char SerialByteIn;                              // Temporary variable
 char HC12ByteIn;                                // Temporary variable
 String HC12ReadBuffer = "";                     // Read/Write Buffer 1 for HC12
@@ -102,8 +103,19 @@ void loop() {
   }
 }
 
-void csma_send(String msg) {
+void csma_send(String msg) { // accepts a message to send as a string and transmits it politely using CSMA/CA
+  int T = Tmin; 
+  int startTime = millis();
+  
   HC12.print(msg);
   Serial.print("[CSMA/CA sent] ");
   Serial.print(msg);
+}
+
+bool _csma_channel_idle() {
+  return true;
+}
+
+bool _csma_collision() { // returns true if there was a collision
+  return false;
 }
