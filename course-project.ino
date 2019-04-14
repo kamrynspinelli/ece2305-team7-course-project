@@ -104,9 +104,30 @@ void loop() {
 }
 
 void csma_send(String msg) { // accepts a message to send as a string and transmits it politely using CSMA/CA
-  int T = Tmin; 
-  int startTime = millis();
-  
+  int T = Tmin; // upper bound on wait time
+  int waitTime = random(0, T); // pick a wait time randomly between 0 and the upper limit
+  int currentTime = 0; // initialize the amount of idle time we've waited to 0
+  int endTimePrevIteration = millis(); // in order to get the wait loop going
+  while (currentTime < waitTime) { // if we haven't waited enough time yet,
+    // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
+    if (_csma_channel_idle()) { // and if the channel was idle since the last iteration,
+      currentTime += millis() - endTimePrevIteration; // update the current time accordingly
+    }
+    endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
+  }
+  while (_csma_collision()) { // if there was a collision, we need to back off
+    T = min(T*2, Tmax); // increase the possible wait time exponentially (up to the maximum amount)
+    waitTime = random(0, T); // pick a wait time randomly between 0 and the upper limit
+    currentTime = 0; // initialize the amount of idle time we've waited to 0
+    endTimePrevIteration = millis(); // in order to get the wait loop going
+    while (currentTime < waitTime) { // if we haven't waited enough time yet,
+      // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
+      if (_csma_channel_idle()) { // and if the channel was idle since the last iteration,
+        currentTime += millis() - endTimePrevIteration; // update the current time accordingly
+      }
+      endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
+    }
+  }
   HC12.print(msg);
   Serial.print("[CSMA/CA sent] ");
   Serial.print(msg);
@@ -131,6 +152,7 @@ bool _csma_channel_idle() { // returns true if the channel is idle
   }
 }
 
+// STUB
 bool _csma_collision() { // returns true if there was a collision
   return false;
 }
