@@ -96,7 +96,7 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   int endTimePrevIteration = millis(); // in order to get the wait loop going
   while (currentTime < waitTime) { // if we haven't waited enough time yet,
     // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
-    if (_csma_channel_idle()) { // and if the channel was idle since the last iteration,
+    if (channel_idle()) { // and if the channel was idle since the last iteration,
       currentTime += millis() - endTimePrevIteration; // update the current time accordingly
     }
     endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
@@ -108,7 +108,7 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
     endTimePrevIteration = millis(); // in order to get the wait loop going
     while (currentTime < waitTime) { // if we haven't waited enough time yet,
       // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
-      if (_csma_channel_idle()) { // and if the channel was idle since the last iteration,
+      if (channel_idle()) { // and if the channel was idle since the last iteration,
         currentTime += millis() - endTimePrevIteration; // update the current time accordingly
       }
       endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
@@ -119,7 +119,7 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   Serial.print(msg);
 }
 
-bool _csma_channel_idle() { // returns true if the channel is idle
+bool channel_idle() { // returns true if the channel is idle
   if (!HC12.available()) { // if nothing is being received on the HC-12,
     return true; // then the channel is idle
   } else { // otherwise, we should accept what is being received and print it to the serial console
@@ -141,4 +141,14 @@ bool _csma_channel_idle() { // returns true if the channel is idle
 // STUB
 bool _csma_collision() { // returns true if there was a collision
   return false;
+}
+
+// STUB
+String * split_packet(String packet) { // consumes a packet string and returns an array containing each field of the packet
+  return 0;
+}
+
+// STUB
+void track_channel(String ip, int channel) { // finds the new channel of the node with the given IP address, and stores it in channel
+  
 }
