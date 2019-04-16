@@ -43,6 +43,11 @@ void setup() {
   delay(80);                                    // 80 ms delay before operation per datasheet
   Serial.begin(9600);                           // Open serial port to computer
   HC12.begin(9600);                             // Open software serial port to HC12
+
+  String *fields = split_packet("192.146.2.45|c4:f2:33:45:1e:eb|blahblahblah");
+  Serial.print(fields[0]);
+  Serial.print(fields[1]);
+  Serial.print(fields[2]);
 }
 
 void loop() {
@@ -143,9 +148,24 @@ bool _csma_collision() { // returns true if there was a collision
   return false;
 }
 
-// STUB
+// TODO: fix memory problems
 String * split_packet(String packet) { // consumes a packet string and returns an array containing each field of the packet
-  return 0;
+  int numpipes = 0; // a variable to count the number of pipe characters in the packet
+  for (int letter = 0; letter < packet.length(); letter++) { // loop through the letters in packet
+    if (packet[letter] = '|') {
+      numpipes++;
+    }
+  }
+  String fields[numpipes+1]; // if the packet has n pipes, then it will have n+1 fields
+  int packetPosition = 0; // start at the first character of the packet
+  for (int field = 0; field < numpipes+1; field++) { // for each field,
+    while (packet[packetPosition] != '|' && packetPosition != packet.length()) { // as long as the current character is not a pipe character and we aren't past the end of the string,
+      fields[field] += packet[packetPosition]; // add this character to the current field,
+      packetPosition++; // and move to the next character
+    }
+    packetPosition++; // in the case that this character was a pipe, move to the next character
+  }
+  return fields;
 }
 
 // STUB
