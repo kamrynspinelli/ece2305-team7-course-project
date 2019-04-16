@@ -62,12 +62,17 @@ void loop() {
     }
   }
 
+  bool readSerial = false; // at this point in the loop, we haven't read anything from the serial connection to the PC
   while (Serial.available()) {                  // If Arduino's computer rx buffer has data
     SerialByteIn = Serial.read();               // Store each character in byteIn
     SerialReadBuffer += char(SerialByteIn);     // Write each character of byteIn to SerialReadBuffer
     if (SerialByteIn == '\n') {                 // Check to see if at the end of the line
       SerialEnd = true;                         // Set SerialEnd flag to indicate end of line
     }
+  }
+  if (readSerial) { // if we did read anything, 
+    SerialEnd = true; // set SerialEnd to true
+    // TODO: check if this fixes the issue with csma_send not working with non-newline line endings
   }
 
   if (SerialEnd) {                              // Check to see if SerialEnd flag is true
