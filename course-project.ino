@@ -29,6 +29,10 @@ boolean SerialEnd = false;                      // Flag to indicate End of Seria
 boolean HC12End = false;                        // Flag to indiacte End of HC12 String
 boolean commandMode = false;                    // Send AT commands
 
+// MAC and password for our team
+String mac = "c6:21:f4:2f:1b:fa";
+String password = "jYygwBQ90QiVQ85P";
+
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
 SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
