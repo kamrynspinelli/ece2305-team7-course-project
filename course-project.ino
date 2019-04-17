@@ -80,7 +80,17 @@ void loop() {
   }
 
   if (SerialEnd) {                              // Check to see if SerialEnd flag is true
-    csma_send(SerialReadBuffer);
+    if (SerialReadBuffer.startsWith("AT")) {    // Has a command been sent from local computer
+      digitalWrite(HC12SetPin, LOW);            // Enter command mode
+      delay(100);                               // Allow chip time to enter command mode
+      Serial.print(SerialReadBuffer);           // Echo command to serial
+      HC12.print(SerialReadBuffer);             // Send command to local HC12
+      delay(500);                               // Wait 0.5s for a response
+      digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
+      delay(100);                               // Delay before proceeding
+    } else {
+      csma_send(SerialReadBuffer);
+    }
     SerialReadBuffer = "";                      // Clear SerialReadBuffer
     SerialEnd = false;                          // Reset serial end of line flag
   }
