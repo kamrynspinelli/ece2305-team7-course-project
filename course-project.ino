@@ -6,6 +6,8 @@
  */
 
 #include <SoftwareSerial.h>
+#include <string.h>
+#include <stdio.h>
 
 // HC12 pin definitions
 const byte HC12RxdPin = 4;                      // "RXD" Pin on HC12
