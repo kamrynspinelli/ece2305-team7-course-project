@@ -47,6 +47,8 @@ String flags[4] = { "cmd:X9yFFij1doeuTjTg",
                     "cmd:0UrKhRPNS0kBE4Db",
                     "cmd:eubOFZcSxM8UnpOr" };
 
+// Mystery nodes wait 1.3s or .7 s (alternating) between successive IP broadcasts
+
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
 SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
