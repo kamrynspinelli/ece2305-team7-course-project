@@ -41,6 +41,12 @@ String ips[4] = { "63.180.94.100",
                   "166.248.98.36",
                   "251.236.64.145" };
 
+// Flags found through manual interaction with the nodes
+String flags[4] = { "cmd:X9yFFij1doeuTjTg",
+                    "cmd:Denh5l4vjdwFbJdp"
+                    "cmd:0UrKhRPNS0kBE4Db",
+                    "cmd:eubOFZcSxM8UnpOr" };
+
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
 SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
