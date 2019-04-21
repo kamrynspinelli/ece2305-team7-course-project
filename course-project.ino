@@ -194,7 +194,44 @@ String * split_packet(String packet) { // consumes a packet string and returns a
   return fields;
 }
 
-// STUB
-void track_channel(String ip, int channel) { // finds the new channel of the node with the given IP address, and stores it in channel
-  
+// finds the new channel of the node with the given IP address, leaves the HC-12 set to that channel, and returns the channel number
+// a return value of -1 indicates that the node with the given IP was not found
+// WARNING: may run for a long time
+int track_channel(String ip) {
+  Serial.print("Looking for node with IP ");
+  Serial.print(ip);
+  Serial.println("...");
+  for (int attempt = 1; attempt <= 3; attempt++) { // we'll scan through all the channels three times to try and find the node
+    for (int channel = 0; channel <= 127; channel++) { // scan through each channel
+      // set the HC-12 to the specified channel
+      digitalWrite(HC12SetPin, LOW);            // Enter command mode
+      delay(100);                               // Allow chip time to enter command mode
+      // the following if statements are messy but that's life
+      if (channel >= 1 && channel <= 9) {
+        HC12.print("AT+C00");             // Send command to local HC12
+        HC12.print(channel);
+      }
+      if (channel >= 10 && channel <= 99) {
+        HC12.print("AT+C0");             // Send command to local HC12
+        HC12.print(channel);
+      }
+      if (channel >= 100 && channel <= 127) {
+        HC12.print("AT+C");             // Send command to local HC12
+        HC12.print(channel);
+      }
+      delay(500);                               // Wait 0.5s for a response
+      digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
+      // print the OK+C___ message before listening for a packet
+      if (!channel_idle()) { // if there's something there
+        if (true) {// and it's broadcasting the right IP, // TODO: implement
+          Serial.print("Found node with IP ");
+          Serial.print(ip);
+          Serial.print(" on channel ");
+          Serial.println(channel);
+          return channel; // then we're on the right channel
+        }
+      }
+    }
+  }
+  return -1; // if we didn't find the right node after all that searching, then let the calling function know
 }
