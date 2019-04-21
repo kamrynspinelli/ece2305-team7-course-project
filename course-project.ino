@@ -35,6 +35,12 @@ boolean commandMode = false;                    // Send AT commands
 String mac = "c6:21:f4:2f:1b:fa";
 String password = "jYygwBQ90QiVQ85P";
 
+// IP addresses for the mystery nodes (excluding the test node outside Wyglinski's office
+String ips[4] = { "63.180.94.100",
+                  "97.121.215.176",
+                  "166.248.98.36",
+                  "251.236.64.145" };
+
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
 SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
@@ -49,11 +55,6 @@ void setup() {
   delay(80);                                    // 80 ms delay before operation per datasheet
   Serial.begin(9600);                           // Open serial port to computer
   HC12.begin(9600);                             // Open software serial port to HC12
-
-  String *fields = split_packet("192.146.2.45|c4:f2:33:45:1e:eb|blahblahblah");
-  Serial.print(fields[0]);
-  Serial.print(fields[1]);
-  Serial.print(fields[2]);
 }
 
 void loop() {
