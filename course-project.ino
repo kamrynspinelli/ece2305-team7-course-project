@@ -221,23 +221,32 @@ int track_channel(String ip) {
 // associates with a node having the specified IP on the current channel by sending a packet of the following format
 // ip|mac
 void associate(String ip) {
-  String packet = ip + "|" + mac;
-  csma_send(packet);
+  String packet = ip + "|" + mac; // construct the packet
+  csma_send(packet); // send the packet
 }
 
 // authenticates with a node having the specified IP on the current channel by sending a packet of the following format
 // ip|mac|password
 void authenticate(String ip) {
-  String packet = ip + "|" + mac + "|" + password;
-  csma_send(packet);
+  String packet = ip + "|" + mac + "|" + password; // construct the packet
+  csma_send(packet); // send the packet
 }
 
-// STUB
 // extracts the flag from a node having the specified IP on the current channel by sending a packet of the following format
 // ip|mac|get_flag
 // returns a string containing all the text received all over the serial connection from the HC-12
 String extract_flag(String ip) {
-  
+  String packet = ip + "|" + mac + "|" + "get_flag"; // construct the packet
+  csma_send(packet); // send the packet
+  delay(2000); // wait 2s for the node to respond
+  String response; // declare a String to which we'll dump all the incoming data
+  while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+    HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+    if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+      response += char(HC12ByteIn);         // Write that character of byteIn to response
+    }
+  }
+  return response;
 }
 
 // solves the challenge by scanning for the node with the specified IP, then associating, authenticating, and extracting the flag

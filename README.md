@@ -10,3 +10,4 @@ Sending text to the Arduino through the serial connection will pass that on to t
     - Channel access style (polite, impatient, aggressive)
     - Scan speed
     - Packet filtering
+    - Get rid of remote command execution, once and for all
