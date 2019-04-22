@@ -9,5 +9,9 @@ Sending text to the Arduino through the serial connection will pass that on to t
 - Set up options
     - Channel access style (polite, impatient, aggressive)
     - Scan speed
-    - Packet filtering
-    - Get rid of remote command execution, once and for all
+- Packet filtering
+- Get rid of remote command execution, once and for all
+
+# To figure out
+- How to filter packets when the nodes don't address them
+- How to detect collisions
