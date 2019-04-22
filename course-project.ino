@@ -176,26 +176,6 @@ bool _csma_collision() { // returns true if there was a collision
   return false;
 }
 
-// TODO: fix memory problems
-String * split_packet(String packet) { // consumes a packet string and returns an array containing each field of the packet
-  int numpipes = 0; // a variable to count the number of pipe characters in the packet
-  for (int letter = 0; letter < packet.length(); letter++) { // loop through the letters in packet
-    if (packet[letter] = '|') {
-      numpipes++;
-    }
-  }
-  String fields[numpipes+1]; // if the packet has n pipes, then it will have n+1 fields
-  int packetPosition = 0; // start at the first character of the packet
-  for (int field = 0; field < numpipes+1; field++) { // for each field,
-    while (packet[packetPosition] != '|' && packetPosition != packet.length()) { // as long as the current character is not a pipe character and we aren't past the end of the string,
-      fields[field] += packet[packetPosition]; // add this character to the current field,
-      packetPosition++; // and move to the next character
-    }
-    packetPosition++; // in the case that this character was a pipe, move to the next character
-  }
-  return fields;
-}
-
 // finds the new channel of the node with the given IP address, leaves the HC-12 set to that channel, and returns the channel number
 // a return value of -1 indicates that the node with the given IP was not found
 // WARNING: may run for a long time
