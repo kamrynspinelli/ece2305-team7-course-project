@@ -237,3 +237,24 @@ int track_channel(String ip) {
   }
   return -1; // if we didn't find the right node after all that searching, then let the calling function know
 }
+
+// STUB
+// associates with a node having the specified IP on the current channel by sending a packet of the following format
+// ip|mac
+void associate(String ip) {
+  
+}
+
+// STUB
+// authenticates with a node having the specified IP on the current channel by sending a packet of the following format
+// ip|mac|password
+void authenticate(String ip) {
+  
+}
+
+// STUB
+// extracts the flag from a node having the specified IP on the current channel by sending a packet of the following format
+// ip|mac|get_flag
+String extract_flag(String ip) {
+  
+}
