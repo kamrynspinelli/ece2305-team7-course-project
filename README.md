@@ -7,5 +7,6 @@ Sending text to the Arduino through the serial connection will pass that on to t
 # To-do
 - Finish implementation of CSMA/CA (specifically collision detection)
 - Set up options
- - Channel access style (polite, impatient, aggressive)
- - Scan speed
+    - Channel access style (polite, impatient, aggressive)
+    - Scan speed
+    - Packet filtering

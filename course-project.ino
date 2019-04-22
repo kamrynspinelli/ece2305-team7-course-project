@@ -255,6 +255,27 @@ void authenticate(String ip) {
 // STUB
 // extracts the flag from a node having the specified IP on the current channel by sending a packet of the following format
 // ip|mac|get_flag
+// returns a string containing all the text received all over the serial connection from the HC-12
 String extract_flag(String ip) {
   
+}
+
+// solves the challenge by scanning for the node with the specified IP, then associating, authenticating, and extracting the flag
+String solve(String ip) {
+  track_channel(ip); // switch to the right channel for the desired node
+  for (int i = 1; i <= 3; i++) {
+    associate(ip); // try associating three times
+  }
+  for (int i = 1; i <= 3; i++) {
+    authenticate(ip); // try authenticating times
+  }
+  for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
+    String maybeflag = extract_flag(ip); // get a possible flag
+    int poscmd = maybeflag.indexOf("cmd:") >= 0; // look for the index of the substring "cmd:" in the possible flag
+    if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
+      // and if the end ofthe flag wasn't cut off, we can return the flag which is 20 characters long in total
+      String flag = maybeflag.substring(poscmd, poscmd+20); // extract the flag itself from the string
+      return flag; // and return it!
+    }
+  }
 }
