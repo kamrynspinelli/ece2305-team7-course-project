@@ -15,6 +15,7 @@ At the serial monitor, you can send to the Arduino the message `solve(n)` where 
 - Packet filtering
 - Get rid of remote command execution, once and for all
 - Implement scanning for nodes with different baud rates
+- Fix memory issues for functions that return strings
 
 # To figure out
 - How to filter packets when the nodes don't address them
