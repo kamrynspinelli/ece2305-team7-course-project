@@ -189,6 +189,7 @@ int track_channel(String ip) {
       digitalWrite(HC12SetPin, LOW);            // Enter command mode
       delay(100);                               // Allow chip time to enter command mode
       // the following if statements are messy but that's life
+      // we can make this neater using sprintf
       if (channel >= 1 && channel <= 9) {
         HC12.print("AT+C00");             // Send command to local HC12
         HC12.print(channel);
@@ -204,8 +205,17 @@ int track_channel(String ip) {
       delay(500);                               // Wait 0.5s for a response
       digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
       // print the OK+C___ message before listening for a packet
-      if (!channel_idle()) { // if there's something there
-        if (true) {// and it's broadcasting the right IP, // TODO: implement
+      delay(1400); // since the nodes wait at most 1.3s between broadcasts, we can expect to capture a broadcast if we wait 1400ms
+      if (HC12.available()) { // if the HC-12 heard something in the time that we waited,
+        String incoming; // dump that data into a string
+        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+          }
+        }
+        Serial.print(incoming);
+        if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
           Serial.print("Found node with IP ");
           Serial.print(ip);
           Serial.print(" on channel ");
