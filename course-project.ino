@@ -97,14 +97,17 @@ void loop() {
       delay(500);                               // Wait 0.5s for a response
       digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
       delay(100);                               // Delay before proceeding
-    } else if (SerialReadBuffer.startsWith("solve")) { // if the solve command was issued
-        // syntax: solve(n) where n is 0..3 (the four nodes)
-        int ipindex = SerialReadBuffer.charAt(6) - '0'; // convert the given parameter as a character to an int
-        Serial.print("Solving for the node with index "); // for debugging purposes
-        Serial.print(ipindex);
-        Serial.print(" corresponding to IP address ");
-        Serial.println(ips[ipindex]);
-        solve(ips[ipindex]); // run the solve() function on that IP address
+    } else if (SerialReadBuffer.startsWith("solve(w)")) { // if the solve(w) command was issued, then solve for Wyglinski's office for debugging purposes
+      Serial.println("Solving for Wyglinski's office node...");
+      solve("167.251.78.6");
+    } else if (SerialReadBuffer.startsWith("solve")) { // if the general solve command was issued
+      // syntax: solve(n) where n is 0..3 (the four nodes)
+      int ipindex = SerialReadBuffer.charAt(6) - '0'; // convert the given parameter as a character to an int
+      Serial.print("Solving for the node with index "); // for debugging purposes
+      Serial.print(ipindex);
+      Serial.print(" corresponding to IP address ");
+      Serial.println(ips[ipindex]);
+      solve(ips[ipindex]); // run the solve() function on that IP address
     } else {
       csma_send(SerialReadBuffer);
     }
@@ -291,9 +294,11 @@ String solve(String ip) {
   track_channel(ip); // switch to the right channel for the desired node
   for (int i = 1; i <= 3; i++) {
     associate(ip); // try associating three times
+    delay(50); // wait a bit
   }
   for (int i = 1; i <= 3; i++) {
     authenticate(ip); // try authenticating times
+    delay(50); // wait a bit
   }
   for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
     String maybeflag = extract_flag(ip); // get a possible flag
@@ -303,5 +308,6 @@ String solve(String ip) {
       String flag = maybeflag.substring(poscmd, poscmd+20); // extract the flag itself from the string
       return flag; // and return it!
     }
+    delay(50); // wait a bit
   }
 }
