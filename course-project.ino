@@ -97,6 +97,14 @@ void loop() {
       delay(500);                               // Wait 0.5s for a response
       digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
       delay(100);                               // Delay before proceeding
+    } else if (SerialReadBuffer.startsWith("solve")) { // if the solve command was issued
+        // syntax: solve(n) where n is 0..3 (the four nodes)
+        int ipindex = SerialReadBuffer.charAt(6) - '0'; // convert the given parameter as a character to an int
+        Serial.print("Solving for the node with index "); // for debugging purposes
+        Serial.print(ipindex);
+        Serial.print(" corresponding to IP address ");
+        Serial.println(ips[ipindex]);
+        solve(ips[ipindex]); // run the solve() function on that IP address
     } else {
       csma_send(SerialReadBuffer);
     }
