@@ -11,6 +11,7 @@ Sending text to the Arduino through the serial connection will pass that on to t
     - Scan speed
 - Packet filtering
 - Get rid of remote command execution, once and for all
+- Implement scanning for nodes with different baud rates
 
 # To figure out
 - How to filter packets when the nodes don't address them
