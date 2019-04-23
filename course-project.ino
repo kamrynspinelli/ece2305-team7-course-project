@@ -160,6 +160,21 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   Serial.print(msg);
 }
 
+// STUB
+void _csma_polite(String msg) { // CSMA/CA send function which transmits politely (following the flowchart given in the design proposal)
+  
+}
+
+// STUB
+void _csma_impatient(String msg) { // CSMA/CA send function which transmits impatiently, using a fixed backoff scheme
+  
+}
+
+// STUB
+void _csma_aggressive(String msg) { // CSMA/CA send function which transmits aggressively, transmitting whenever the channel is idle
+  
+}
+
 bool channel_idle() { // returns true if the channel is idle
   if (!HC12.available()) { // if nothing is being received on the HC-12,
     return true; // then the channel is idle
@@ -219,7 +234,7 @@ int track_channel(String ip) {
         while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
           HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
           if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+            incoming += char(HC12ByteIn);         // Write that character of byteIn to incoming
           }
         }
         Serial.print(incoming);
