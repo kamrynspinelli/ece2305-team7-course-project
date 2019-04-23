@@ -170,9 +170,13 @@ void _csma_impatient(String msg) { // CSMA/CA send function which transmits impa
   
 }
 
-// STUB
 void _csma_aggressive(String msg) { // CSMA/CA send function which transmits aggressively, transmitting whenever the channel is idle
-  
+  while(!channel_idle()) {
+    // wait until the channel stops being busy
+  }
+  HC12.print(msg); // then send the message to the HC-12
+  Serial.print("[CSMA/CA sent] ");
+  Serial.print(msg);
 }
 
 bool channel_idle() { // returns true if the channel is idle
