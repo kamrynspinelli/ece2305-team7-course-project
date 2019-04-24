@@ -6,6 +6,7 @@
  */
 
 #include <SoftwareSerial.h>
+#include <AltSoftSerial.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -51,6 +52,7 @@ String flags[4] = { "cmd:X9yFFij1doeuTjTg",
 
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
+// SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
 SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
 
 void setup() {
@@ -158,6 +160,7 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
       endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
     }
   }
+  flush_hc12();
   HC12.print(msg);
   Serial.print("[CSMA/CA sent] ");
   Serial.print(msg);
@@ -278,14 +281,14 @@ void authenticate(String ip) {
 void extract_flag(String ip, String &response) {
   String packet = ip + "|" + mac + "|" + "get_flag"; // construct the packet
   csma_send(packet); // send the packet
-  delay(2000); // wait 2s for the node to respond
+  /*delay(2000); // wait 2s for the node to respond
   while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
     HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
     if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
       response += char(HC12ByteIn);         // Write that character of byteIn to response
     }
   }
-  Serial.print(response);
+  Serial.print(response);*/
 }
 
 // solves the challenge by scanning for the node with the specified IP, then associating, authenticating, and extracting the flag
@@ -302,7 +305,7 @@ String solve(String ip) {
   for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
     String maybeflag; // declare a string to hold the possible flag
     extract_flag(ip, maybeflag); // get a possible flag
-    int poscmd = maybeflag.indexOf("cmd:") >= 0; // look for the index of the substring "cmd:" in the possible flag
+    int poscmd = maybeflag.indexOf("cmd:"); // look for the index of the substring "cmd:" in the possible flag
     if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
       // and if the end ofthe flag wasn't cut off, we can return the flag which is 20 characters long in total
       String flag = maybeflag.substring(poscmd, poscmd+20); // extract the flag itself from the string
@@ -324,19 +327,72 @@ String solvew() {
   digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
   // print the OK+C___ message before listening for a packet
   delay(500);
-  for (int i = 1; i <= 3; i++) {
+  /*String received;
+  while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+    HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+    if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+      received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+    }
+    if (HC12ByteIn == '\n') {                   // At the end of the line
+      HC12End = true;                           // Set HC12End flag to true
+    }
+  }
+  Serial.println(received);
+  received = "";
+  // for (int i = 1; i <= 3; i++) {
+  for (int i = 1; i <= 1; i++) {
     associate(ip); // try associating three times
     delay(1000); // wait a bit
+    while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+      HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+      if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+        received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+      }
+      if (HC12ByteIn == '\n') {                   // At the end of the line
+        HC12End = true;                           // Set HC12End flag to true
+      }
+    }
+    Serial.println(received);
+    received = "";
+    delay(1000);
   }
-  for (int i = 1; i <= 3; i++) {
+  // for (int i = 1; i <= 3; i++) {
+  for (int i = 1; i <= 1; i++) {
     authenticate(ip); // try authenticating times
     delay(1000); // wait a bit
-  }
-  for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
+    while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+      HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+      if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+        received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+      }
+      if (HC12ByteIn == '\n') {                   // At the end of the line
+        HC12End = true;                           // Set HC12End flag to true
+      }
+    }
+    Serial.println(received);
+    received = "";
+    delay(1000);
+  }*/
+  // for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
+  for (int i = 1; i <= 1; i++) {
     String maybeflag; // declare a string to hold the possible flag
+    flush_hc12();
     extract_flag(ip, maybeflag); // get a possible flag
-    Serial.print(maybeflag);
-    int poscmd = maybeflag.indexOf("cmd:") >= 0; // look for the index of the substring "cmd:" in the possible flag
+    int starttime = millis();
+    while(millis() < starttime+2000){
+    while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+      HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+      if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+        maybeflag += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+      }
+      if (HC12ByteIn == '\n') {                   // At the end of the line
+        HC12End = true;                           // Set HC12End flag to true
+      }
+    }
+    }
+    Serial.print("Value of maybeflag: ");
+    Serial.println(maybeflag);
+    int poscmd = maybeflag.indexOf("cmd:"); // look for the index of the substring "cmd:" in the possible flag
     if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
       // and if the end ofthe flag wasn't cut off, we can return the flag which is 20 characters long in total
       String flag = maybeflag.substring(poscmd, poscmd+20); // extract the flag itself from the string
@@ -345,5 +401,11 @@ String solvew() {
       return flag; // and return it!
     }
     delay(1000); // wait a bit
+  }
+}
+
+void flush_hc12() {
+  while (HC12.available()) {
+    HC12.read();
   }
 }

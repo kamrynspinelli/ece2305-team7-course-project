@@ -20,3 +20,18 @@ At the serial monitor, you can send to the Arduino the message `solve(n)` where 
 # To figure out
 - How to filter packets when the nodes don't address them
 - How to detect collisions
+
+# Be careful with
+- If you simply wait for a certain amount of time to let the serial buffer fill, then read out of it, you'll get garbled text. Instead, the right way to handle this is to use a while loop as follows:
+```int starttime = millis();
+while(millis() < starttime+2000){
+  while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+    HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+    if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+      text += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+    }
+    if (HC12ByteIn == '\n') {                   // At the end of the line
+      HC12End = true;                           // Set HC12End flag to true
+    }
+  }
+}```
