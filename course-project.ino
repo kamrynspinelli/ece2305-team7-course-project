@@ -219,7 +219,8 @@ int track_channel(String ip) {
   String incoming; // declare a string to be used later for incoming data
   int starttime;
   for (int attempt = 1; attempt <= 3; attempt++) { // we'll scan through all the channels three times to try and find the node
-    for (int channel = 0; channel <= 127; channel++) { // scan through each channel
+    // for (int channel = 0; channel <= 127; channel++) { // scan through each channel
+    for (int channel = 83; channel <= 127; channel++) { // scan through each channel
       Serial.print("[");
       Serial.print(attempt);
       Serial.print(",");
@@ -275,15 +276,18 @@ int track_channel(String ip) {
         Serial.print("Found signal on channel ");
         Serial.println(channel);
         starttime = millis(); // and collect data again for 1.4 seconds
-        while (millis() < starttime+1400){
-          while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
-            HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
-            if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-              incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
-            }
+        while (millis() < starttime+4000){
+        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
           }
         }
-        Serial.print(incoming);
+        }
+        Serial.println("Printing received data...");
+        Serial.println(incoming);
+        Serial.println("Finished printing received data. About to decide if we found the right IP.");
+        Serial.println(incoming.indexOf(ip)); // test print
         if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
           Serial.print("Found node with IP ");
           Serial.print(ip);
