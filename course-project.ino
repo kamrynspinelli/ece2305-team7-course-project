@@ -216,8 +216,16 @@ int track_channel(String ip) {
   Serial.print("Looking for node with IP ");
   Serial.print(ip);
   Serial.println("...");
+  String incoming; // declare a string to be used later for incoming data
+  int starttime;
   for (int attempt = 1; attempt <= 3; attempt++) { // we'll scan through all the channels three times to try and find the node
     for (int channel = 0; channel <= 127; channel++) { // scan through each channel
+      Serial.print("[");
+      Serial.print(attempt);
+      Serial.print(",");
+      Serial.print(channel);
+      Serial.println("]");
+      flush_hc12();
       // set the HC-12 to the specified channel
       digitalWrite(HC12SetPin, LOW);            // Enter command mode
       delay(100);                               // Allow chip time to enter command mode
@@ -235,10 +243,60 @@ int track_channel(String ip) {
         HC12.print("AT+C");             // Send command to local HC12
         HC12.print(channel);
       }
-      delay(500);                               // Wait 0.5s for a response
       digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
       // print the OK+C___ message before listening for a packet
-      delay(1400); // since the nodes wait at most 1.3s between broadcasts, we can expect to capture a broadcast if we wait 1400ms
+      /*int starttime = millis();
+      while (millis() < starttime+500){
+        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+            Serial.print(char(HC12ByteIn));         // Write that character of byteIn to HC12ReadBuffer
+          }
+          if (HC12ByteIn == '\n') {                   // At the end of the line
+            HC12End = true;                           // Set HC12End flag to true
+          }
+        }
+      }*/
+      delay(500);
+      flush_hc12(); // flush the HC-12 buffer
+      // THE ISSUE IS SOMEWHERE BETWEEN HERE
+      /*starttime = millis();
+      while (millis() < starttime+1400){
+        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+          }
+        }
+      }*/
+      flush_hc12(); // flush the buffer
+      delay(1400); // collect data from the HC-12 for 1.4s
+      if (HC12.available()) { // if there's data in the HC-12's buffer, then we should record again and inspect what we received.
+        Serial.print("Found signal on channel ");
+        Serial.println(channel);
+        starttime = millis(); // and collect data again for 1.4 seconds
+        while (millis() < starttime+1400){
+          while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+            HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+            if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+              incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+            }
+          }
+        }
+        Serial.print(incoming);
+        if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
+          Serial.print("Found node with IP ");
+          Serial.print(ip);
+          Serial.print(" on channel ");
+          Serial.println(channel);
+          return channel; // then we're on the right channel
+        } else {
+          Serial.println("Wrong IP");
+        }
+      }
+      // AND HERE
+      incoming = "";
+      /*delay(1400); // since the nodes wait at most 1.3s between broadcasts, we can expect to capture a broadcast if we wait 1400ms
       if (HC12.available()) { // if the HC-12 heard something in the time that we waited,
         String incoming; // dump that data into a string
         while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
@@ -255,7 +313,7 @@ int track_channel(String ip) {
           Serial.println(channel);
           return channel; // then we're on the right channel
         }
-      }
+      }*/
     }
   }
   return -1; // if we didn't find the right node after all that searching, then let the calling function know
