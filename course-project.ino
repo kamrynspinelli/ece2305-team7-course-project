@@ -220,12 +220,9 @@ int track_channel(String ip) {
   int starttime;
   for (int attempt = 1; attempt <= 3; attempt++) { // we'll scan through all the channels three times to try and find the node
     // for (int channel = 0; channel <= 127; channel++) { // scan through each channel
-    for (int channel = 83; channel <= 127; channel++) { // scan through each channel
-      Serial.print("[");
-      Serial.print(attempt);
-      Serial.print(",");
-      Serial.print(channel);
-      Serial.println("]");
+    for (int channel = 1; channel <= 127; channel++) { // scan through each channel
+      Serial.print("Scanning channel ");
+      Serial.println(channel);
       flush_hc12();
       // set the HC-12 to the specified channel
       digitalWrite(HC12SetPin, LOW);            // Enter command mode
@@ -246,30 +243,7 @@ int track_channel(String ip) {
       }
       digitalWrite(HC12SetPin, HIGH);           // Exit command / enter transparent mode
       // print the OK+C___ message before listening for a packet
-      /*int starttime = millis();
-      while (millis() < starttime+500){
-        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
-          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
-          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-            Serial.print(char(HC12ByteIn));         // Write that character of byteIn to HC12ReadBuffer
-          }
-          if (HC12ByteIn == '\n') {                   // At the end of the line
-            HC12End = true;                           // Set HC12End flag to true
-          }
-        }
-      }*/
       delay(500);
-      flush_hc12(); // flush the HC-12 buffer
-      // THE ISSUE IS SOMEWHERE BETWEEN HERE
-      /*starttime = millis();
-      while (millis() < starttime+1400){
-        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
-          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
-          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
-          }
-        }
-      }*/
       flush_hc12(); // flush the buffer
       delay(1400); // collect data from the HC-12 for 1.4s
       if (HC12.available()) { // if there's data in the HC-12's buffer, then we should record again and inspect what we received.
@@ -277,12 +251,12 @@ int track_channel(String ip) {
         Serial.println(channel);
         starttime = millis(); // and collect data again for 1.4 seconds
         while (millis() < starttime+4000){
-        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
-          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
-          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-            incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+          while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+            HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+            if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+              incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+            }
           }
-        }
         }
         Serial.println("Printing received data...");
         Serial.println(incoming);
@@ -298,26 +272,7 @@ int track_channel(String ip) {
           Serial.println("Wrong IP");
         }
       }
-      // AND HERE
       incoming = "";
-      /*delay(1400); // since the nodes wait at most 1.3s between broadcasts, we can expect to capture a broadcast if we wait 1400ms
-      if (HC12.available()) { // if the HC-12 heard something in the time that we waited,
-        String incoming; // dump that data into a string
-        while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
-          HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
-          if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
-            incoming += char(HC12ByteIn);         // Write that character of byteIn to incoming
-          }
-        }
-        Serial.print(incoming);
-        if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
-          Serial.print("Found node with IP ");
-          Serial.print(ip);
-          Serial.print(" on channel ");
-          Serial.println(channel);
-          return channel; // then we're on the right channel
-        }
-      }*/
     }
   }
   return -1; // if we didn't find the right node after all that searching, then let the calling function know
@@ -356,7 +311,91 @@ void extract_flag(String ip, String &response) {
 // solves the challenge by scanning for the node with the specified IP, then associating, authenticating, and extracting the flag
 String solve(String ip) {
   track_channel(ip); // switch to the right channel for the desired node
-  for (int i = 1; i <= 3; i++) {
+  String received;
+  while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+    HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+    if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+      received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+    }
+    if (HC12ByteIn == '\n') {                   // At the end of the line
+      HC12End = true;                           // Set HC12End flag to true
+    }
+  }
+  Serial.println(received);
+  received = "";
+  // for (int i = 1; i <= 3; i++) {
+  for (int i = 1; i <= 1; i++) {
+    flush_hc12();
+    associate(ip); // try associating three times
+    /*int starttime = millis();
+    while (millis() < starttime+2000) {
+      while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+        HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+        if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+          received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+        }
+        if (HC12ByteIn == '\n') {                   // At the end of the line
+          HC12End = true;                           // Set HC12End flag to true
+        }
+      }
+    }
+    Serial.println(received);
+    received = "";*/
+    delay(4000);
+    flush_hc12();
+  }
+  // for (int i = 1; i <= 3; i++) {
+  for (int i = 1; i <= 1; i++) {
+    flush_hc12();
+    authenticate(ip); // try authenticating times
+    /*int starttime = millis();
+    while (millis() < starttime+2000) {
+      while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+        HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+        if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+          received += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+        }
+        if (HC12ByteIn == '\n') {                   // At the end of the line
+          HC12End = true;                           // Set HC12End flag to true
+        }
+      }
+    }
+    Serial.println(received);
+    received = "";*/
+    delay(4000);
+    flush_hc12();
+  }
+  // for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
+  for (int i = 1; i <= 1; i++) {
+    String maybeflag; // declare a string to hold the possible flag
+    flush_hc12();
+    extract_flag(ip, maybeflag); // get a possible flag
+    int starttime = millis();
+    while (millis() < starttime+4000){
+      while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+        HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
+        if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
+          maybeflag += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
+        }
+        if (HC12ByteIn == '\n') {                   // At the end of the line
+          HC12End = true;                           // Set HC12End flag to true
+        }
+      }
+    }
+    /*Serial.print("[maybeflag begin] ");
+    Serial.println(maybeflag);
+    Serial.println("[maybleflag end]");*/
+    int poscmd = maybeflag.indexOf("cmd:"); // look for the index of the substring "cmd:" in the possible flag
+    if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
+      // and if the end ofthe flag wasn't cut off, we can return the flag which is 20 characters long in total
+      String flag = maybeflag.substring(poscmd, poscmd+20); // extract the flag itself from the string
+      Serial.println("The flag is:");
+      Serial.println(flag); // print it to the serial monitor
+      return flag; // and return it!
+    }
+    delay(2000); // wait a bit
+  }
+  /*for (int i = 1; i <= 3; i++) {
     associate(ip); // try associating three times
     delay(1000); // wait a bit
   }
@@ -376,7 +415,7 @@ String solve(String ip) {
       return flag; // and return it!
     }
     delay(1000); // wait a bit
-  }
+  }*/
 }
 
 // solves the challenge for Wyglinski's node by switching to channel 1, then associating, authenticating, and extracting the flag
