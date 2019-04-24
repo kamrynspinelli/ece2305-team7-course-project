@@ -100,7 +100,7 @@ void loop() {
     } else if (SerialReadBuffer.startsWith("solve(w)")) { // if the solve(w) command was issued, then solve for Wyglinski's office for debugging purposes
       Serial.println("Solving for Wyglinski's office node...");
       solvew();
-    } else if (SerialReadBuffer.startsWith("solve")) { // if the general solve command was issued
+    } else if (SerialReadBuffer.startsWith("solve(")) { // if the general solve command was issued
       // syntax: solve(n) where n is 0..3 (the four nodes)
       int ipindex = SerialReadBuffer.charAt(6) - '0'; // convert the given parameter as a character to an int
       Serial.print("Solving for the node with index "); // for debugging purposes
@@ -274,19 +274,18 @@ void authenticate(String ip) {
 
 // extracts the flag from a node having the specified IP on the current channel by sending a packet of the following format
 // ip|mac|get_flag
-// returns a string containing all the text received all over the serial connection from the HC-12
-String extract_flag(String ip) {
+// puts into &response all the text received all over the serial connection from the HC-12
+void extract_flag(String ip, String &response) {
   String packet = ip + "|" + mac + "|" + "get_flag"; // construct the packet
   csma_send(packet); // send the packet
   delay(2000); // wait 2s for the node to respond
-  String response; // declare a String to which we'll dump all the incoming data
   while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
     HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
     if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
       response += char(HC12ByteIn);         // Write that character of byteIn to response
     }
   }
-  return response;
+  Serial.print(response);
 }
 
 // solves the challenge by scanning for the node with the specified IP, then associating, authenticating, and extracting the flag
@@ -301,7 +300,8 @@ String solve(String ip) {
     delay(1000); // wait a bit
   }
   for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
-    String maybeflag = extract_flag(ip); // get a possible flag
+    String maybeflag; // declare a string to hold the possible flag
+    extract_flag(ip, maybeflag); // get a possible flag
     int poscmd = maybeflag.indexOf("cmd:") >= 0; // look for the index of the substring "cmd:" in the possible flag
     if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
       // and if the end ofthe flag wasn't cut off, we can return the flag which is 20 characters long in total
@@ -333,7 +333,8 @@ String solvew() {
     delay(1000); // wait a bit
   }
   for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
-    String maybeflag = extract_flag(ip); // get a possible flag
+    String maybeflag; // declare a string to hold the possible flag
+    extract_flag(ip, maybeflag); // get a possible flag
     Serial.print(maybeflag);
     int poscmd = maybeflag.indexOf("cmd:") >= 0; // look for the index of the substring "cmd:" in the possible flag
     if (poscmd >= 0 && poscmd+20 < maybeflag.length()) { // if this position is greater than 0 , we found this substring in the string
