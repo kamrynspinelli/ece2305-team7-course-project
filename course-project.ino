@@ -249,18 +249,22 @@ int track_channel(String ip) {
         Serial.print("Found signal on channel ");
         Serial.println(channel);
         flush_hc12();
-        // hangs between here
-        starttime = millis(); // and collect data again for 4 seconds
-        while (millis() < starttime+4000){
-          while (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
+        int currentTime = 0; // initialize the amount of idle time we've waited to 0
+        int endTimePrevIteration = millis(); // in order to get the wait loop going
+        while (currentTime < 4000) { // if we haven't waited enough time yet,
+          // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
+          if (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
             HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
             if (!isspace(HC12ByteIn) || HC12ByteIn == '\n') { // If the incoming character is a non-newline whitespace character,
               incoming += char(HC12ByteIn);         // Write that character of byteIn to HC12ReadBuffer
             }
+            if (HC12ByteIn == '\n') {                   // At the end of the line
+              HC12End = true;                           // Set HC12End flag to true
+            }
           }
-          delay(100); // wait a small amount of time
+          currentTime += millis() - endTimePrevIteration; // update the current time accordingly
+          endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
         }
-        // and here
         Serial.println("Printing received data...");
         Serial.println(incoming);
         Serial.println("Finished printing received data. About to decide if we found the right IP.");
