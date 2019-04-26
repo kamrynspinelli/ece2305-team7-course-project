@@ -178,9 +178,26 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   Serial.println(msg);
 }
 
-// STUB
 void _csma_polite(String msg) { // CSMA/CA send function which transmits politely (following the flowchart given in the design proposal)
-  
+  int T = Tmin; // upper bound on wait time. will be increased exponentially if there are collisions
+  do {
+    int waitTime = random(0, T); // pick a wait time randomly between 0 and T
+    int currentTime = 0; // initialize the amount of idle time we've waited to 0
+    int endTimePrevIteration = millis(); // in order to get the wait loop going
+    while (currentTime < waitTime) { // if we haven't waited enough time yet,
+      // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
+      if (channel_idle()) { // and if the channel was idle since the last iteration,
+        currentTime += millis() - endTimePrevIteration; // update the current time accordingly
+      }
+      endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
+    }
+    T = min(T*2, Tmax); // update the upper limit on wait time in case we have a collision
+    Serial.print("[CSMA/CA sent] ");
+    Serial.println(msg);
+    flush_hc12(); // clean out the buffer so we can read for collisions
+    HC12.print(msg); // transmit
+  } while (_csma_collision()); // repeat if there was a collision
+  Serial.println("[CSMA/CA send complete]");
 }
 
 void _csma_impatient(String msg) { // CSMA/CA send function which transmits impatiently, using a fixed backoff scheme
