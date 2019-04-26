@@ -264,7 +264,6 @@ bool _csma_collision() { // returns true if there was a collision
 int track_channel(String ip) {
   Serial.print("Looking for node with IP ");
   Serial.print(ip);
-  Serial.println("...");
   String incoming; // declare a string to be used later for incoming data
   int starttime;
   for (int attempt = 1; attempt <= 3; attempt++) { // we'll scan through all the channels three times to try and find the node
@@ -321,10 +320,10 @@ int track_channel(String ip) {
           currentTime += millis() - endTimePrevIteration; // update the current time accordingly
           endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
         }
-        Serial.println("Printing received data...");
-        Serial.println(incoming);
-        Serial.println("Finished printing received data. About to decide if we found the right IP.");
-        Serial.println(incoming.indexOf(ip)); // test print
+        //Serial.println("Printing received data...");
+        //Serial.println(incoming);
+        //Serial.println("Finished printing received data. About to decide if we found the right IP.");
+        //Serial.println(incoming.indexOf(ip)); // test print
         if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
           Serial.print("Found node with IP ");
           Serial.print(ip);
@@ -390,6 +389,7 @@ String solve(String ip) {
   received = "";
   // for (int i = 1; i <= 3; i++) {
   for (int i = 1; i <= 1; i++) {
+    Serial.println("Associating");
     flush_hc12();
     associate(ip); // try associating three times
     /*int starttime = millis();
@@ -411,6 +411,7 @@ String solve(String ip) {
   }
   // for (int i = 1; i <= 3; i++) {
   for (int i = 1; i <= 1; i++) {
+    Serial.println("Authenticating");
     flush_hc12();
     authenticate(ip); // try authenticating times
     /*int starttime = millis();
@@ -433,12 +434,12 @@ String solve(String ip) {
   // for (int i = 1; i <= 3; i++) { // finally, we will try thrice to obtain the flag itself
   for (int i = 1; i <= 1; i++) {
     String maybeflag; // declare a string to hold the possible flag
-    flush_hc12();
     Serial.println("Sending get_flag command");
+    flush_hc12();
     extract_flag(ip, maybeflag); // get a possible flag
-    Serial.println("Starting timer");
+    //Serial.println("Starting timer");
     int starttime = millis();
-    Serial.println("Entering loop");
+    //Serial.println("Entering loop");
     /*while (millis() < starttime+4000){
       if (HC12.available()) {                    // While Arduino's HC12 soft serial rx buffer has data
         HC12ByteIn = HC12.read();                   // Store each character from rx buffer in byteIn
@@ -466,7 +467,7 @@ String solve(String ip) {
       currentTime += millis() - endTimePrevIteration; // update the current time accordingly
       endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
     }
-    Serial.println("Exiting loop");
+    // Serial.println("Exiting loop");
     /*Serial.print("[maybeflag begin] ");
     Serial.println(maybeflag);
     Serial.println("[maybleflag end]");*/
