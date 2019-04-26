@@ -19,7 +19,6 @@ The program currently allows users to set two options at the serial prompt: chan
 - Packet filtering
 - Get rid of remote command execution, once and for all
 - Implement scanning for nodes with different baud rates
-- Allow user to set options from the serial monitor
 
 # To figure out
 - How to filter packets when the nodes don't address them
@@ -37,4 +36,6 @@ while(millis() < starttime+2000){
       HC12End = true;                           // Set HC12End flag to true
     }
   }
-}```
+}
+```
+- Once roughly 75% of RAM is used for global variables and constant strings, undefined behavior may occur. We need to keep an eye on this and make optimizations if necessary.
