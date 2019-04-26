@@ -6,6 +6,14 @@ Team 7 submission for ECE 2305: reverse-engineering and communicating with trans
 Sending text to the Arduino through the serial connection will pass that on to the HC-12. The serial monitor should be configured with newline as the line ending, since our program removes whitespace from all serial messages in both directions.
 ## Automatic mode (`solve`)
 At the serial monitor, you can send to the Arduino the message `solve(n)` where n is one of 0..3. This will tell the Arduino to run the programmed `solve()` function on the `n`th node. This function is an automatic solver which scans to find the right node, then associates, authenticates, and extracts the flag.
+## Setting options
+The program currently allows users to set two options at the serial prompt: channel access style and scan speed. The following commands at the serial monitor will produce the described effect.
+- `accessstyle=polite`: polite channel access
+- `accessstyle=impatient`: impatient channel access
+- `accessstyle=aggressive`: aggressive channel access
+- `scanspeed=slow`: slow scan speed
+- `scanspeed=medium`: medium scan speed
+- `scanspeed=fast`: fast scan speed
 
 # To-do
 - Packet filtering

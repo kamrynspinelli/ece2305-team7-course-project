@@ -122,6 +122,18 @@ void loop() {
       Serial.print(" corresponding to IP address ");
       Serial.println(ips[ipindex]);
       solve(ips[ipindex]); // run the solve() function on that IP address
+    } else if (SerialReadBuffer.startsWith("accessstyle=polite")) { // set channel access style options
+      opts[0] = 0;
+    } else if (SerialReadBuffer.startsWith("accessstyle=impatient")) {
+      opts[0] = 1;
+    } else if (SerialReadBuffer.startsWith("accessstyle=aggressive")) {
+      opts[0] = 2;
+    } else if (SerialReadBuffer.startsWith("scanspeed=slow")) { // set scan speed options
+      opts[1] = 0;
+    } else if (SerialReadBuffer.startsWith("scanspeed=medium")) {
+      opts[1] = 1;
+    } else if (SerialReadBuffer.startsWith("scanspeed=fast")) {
+      opts[1] = 2;
     } else {
       csma_send(SerialReadBuffer);
     }
