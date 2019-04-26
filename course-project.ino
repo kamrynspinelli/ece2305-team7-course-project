@@ -256,7 +256,14 @@ int track_channel(String ip) {
       // print the OK+C___ message before listening for a packet
       delay(500); // wait .5s for the OK message
       flush_hc12(); // flush the buffer
-      delay(1400); // collect data from the HC-12 for 1.4s
+      switch (opts[1]) {
+        case 0 : // slow
+          delay(2000); 
+        case 1 : // medium
+          delay(1400);
+        case 2 : // fast
+          delay(800);
+      }
       if (HC12.available()) { // if there's data in the HC-12's buffer, then we should record again and inspect what we received.
         Serial.print("Found signal on channel ");
         Serial.println(channel);
