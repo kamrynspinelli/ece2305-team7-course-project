@@ -148,7 +148,7 @@ void loop() {
 }
 
 void csma_send(String msg) { // accepts a message to send as a string and transmits it politely using CSMA/CA
-  int T = Tmin; // upper bound on wait time
+  /*int T = Tmin; // upper bound on wait time
   int waitTime = random(0, T); // pick a wait time randomly between 0 and the upper limit
   int currentTime = 0; // initialize the amount of idle time we've waited to 0
   int endTimePrevIteration = millis(); // in order to get the wait loop going
@@ -175,7 +175,18 @@ void csma_send(String msg) { // accepts a message to send as a string and transm
   flush_hc12();
   HC12.print(msg);
   Serial.print("[CSMA/CA sent] ");
-  Serial.println(msg);
+  Serial.println(msg);*/
+  switch (opts[0]) {
+    case 0 :
+      _csma_polite(msg);
+      break;
+    case 1 :
+      _csma_impatient(msg);
+      break;
+    case 2 :
+      _csma_aggressive(msg);
+      break;
+  }
 }
 
 void _csma_polite(String msg) { // CSMA/CA send function which transmits politely (following the flowchart given in the design proposal)
@@ -254,7 +265,14 @@ bool channel_idle() { // returns true if the channel is idle
 
 // STUB
 bool _csma_collision() { // returns true if there was a collision
-  return false;
+  // return false;
+  if (HC12.available()) { // if there's data immediately available, someone else was probably talking at the same time as us
+    flush_hc12(); // so flush the HC-12 buffer
+    return true; // and let the calling function know we collided
+  } else { // otherwise, no collision
+    flush_hc12(); // still flush the buffer
+    return false; // and let the calling function know we didn't collide
+  }
 }
 
 // finds the new channel of the node with the given IP address, leaves the HC-12 set to that channel, and returns the channel number
