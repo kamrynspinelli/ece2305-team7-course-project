@@ -43,10 +43,10 @@ String ips[4] = { "63.180.94.100",
                   "251.236.64.145" };
 
 // Flags found through manual interaction with the nodes
-String flags[4] = { "cmd:X9yFFij1doeuTjTg",
+/*String flags[4] = { "cmd:X9yFFij1doeuTjTg",
                     "cmd:Denh5l4vjdwFbJdp",
                     "cmd:0UrKhRPNS0kBE4Db",
-                    "cmd:eubOFZcSxM8UnpOr" };
+                    "cmd:eubOFZcSxM8UnpOr" };*/
 
 // Mystery nodes wait 1.3s or .7 s (alternating) between successive IP broadcasts
 
