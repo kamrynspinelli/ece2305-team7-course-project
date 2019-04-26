@@ -183,18 +183,37 @@ void _csma_polite(String msg) { // CSMA/CA send function which transmits politel
   
 }
 
-// STUB
 void _csma_impatient(String msg) { // CSMA/CA send function which transmits impatiently, using a fixed backoff scheme
-  
+  do {
+    int waitTime = random(0, Tmin); // pick a wait time randomly between 0 and Tmin
+    int currentTime = 0; // initialize the amount of idle time we've waited to 0
+    int endTimePrevIteration = millis(); // in order to get the wait loop going
+    while (currentTime < waitTime) { // if we haven't waited enough time yet,
+      // the idea here is that millis() - endTimePrevIteration should always equal the time that elapsed in this iteration of the look
+      if (channel_idle()) { // and if the channel was idle since the last iteration,
+        currentTime += millis() - endTimePrevIteration; // update the current time accordingly
+      }
+      endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
+    }
+    Serial.print("[CSMA/CA sent] ");
+    Serial.println(msg);
+    flush_hc12(); // clean out the buffer so we can read for collisions
+    HC12.print(msg); // transmit
+  } while (_csma_collision()); // repeat if there was a collision
+  Serial.println("[CSMA/CA send complete]");
 }
 
 void _csma_aggressive(String msg) { // CSMA/CA send function which transmits aggressively, transmitting whenever the channel is idle
-  while(!channel_idle()) {
-    // wait until the channel stops being busy
-  }
-  HC12.print(msg); // then send the message to the HC-12
-  Serial.print("[CSMA/CA sent] ");
-  Serial.println(msg);
+  do {
+    while(!channel_idle()) {
+      // wait until the channel stops being busy
+    }
+    Serial.print("[CSMA/CA sent] ");
+    Serial.println(msg);
+    flush_hc12(); // clean out the buffer so we can read for collisions
+    HC12.print(msg); // transmit
+  } while (_csma_collision()); // repeat if there was a collision
+  Serial.println("[CSMA/CA send complete]");
 }
 
 bool channel_idle() { // returns true if the channel is idle
