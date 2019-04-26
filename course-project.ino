@@ -50,6 +50,18 @@ String flags[4] = { "cmd:X9yFFij1doeuTjTg",
 
 // Mystery nodes wait 1.3s or .7 s (alternating) between successive IP broadcasts
 
+/* Array to hold options for the program
+ * opts[0]:
+ *   0: polite channel access (default)
+ *   1: impatient channel access
+ *   2: aggressive channel access
+ * opts[1]:
+ *   0: slow scan speed (2s per channel)
+ *   1: medium scan speed (1.4s per channel) (default
+ *   2: fast scan speed (0.8s per channel)
+ */
+int opts[2] = {0,1};
+
 // Software Serial ports Rx and Tx are opposite the HC12 Rx and Tx
 // Create Software Serial Port for HC12
 // SoftwareSerial HC12(HC12TxdPin, HC12RxdPin);
