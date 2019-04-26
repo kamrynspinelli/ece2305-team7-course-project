@@ -8,18 +8,13 @@ Sending text to the Arduino through the serial connection will pass that on to t
 At the serial monitor, you can send to the Arduino the message `solve(n)` where n is one of 0..3. This will tell the Arduino to run the programmed `solve()` function on the `n`th node. This function is an automatic solver which scans to find the right node, then associates, authenticates, and extracts the flag.
 
 # To-do
-- Finish implementation of CSMA/CA (specifically collision detection)
-- Set up options
-    - Channel access style (polite, impatient, aggressive)
-    - Scan speed
 - Packet filtering
 - Get rid of remote command execution, once and for all
 - Implement scanning for nodes with different baud rates
-- Fix memory issues for functions that return strings
+- Allow user to set options from the serial monitor
 
 # To figure out
 - How to filter packets when the nodes don't address them
-- How to detect collisions
 
 # Be careful with
 - If you simply wait for a certain amount of time to let the serial buffer fill, then read out of it, you'll get garbled text. Instead, the right way to handle this is to use a while loop as follows:
