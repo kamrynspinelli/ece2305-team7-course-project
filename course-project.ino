@@ -320,10 +320,10 @@ int track_channel(String ip) {
           currentTime += millis() - endTimePrevIteration; // update the current time accordingly
           endTimePrevIteration = millis(); // set the current time to be the end time of this iteration, so when the loop restarts we'll be able to keep time
         }
-        //Serial.println("Printing received data...");
-        //Serial.println(incoming);
-        //Serial.println("Finished printing received data. About to decide if we found the right IP.");
-        //Serial.println(incoming.indexOf(ip)); // test print
+        Serial.println("Printing received data..."); // Debugging per Austin's suggestion
+        Serial.println(incoming);
+        Serial.println("Finished printing received data. About to decide if we found the right IP.");
+        // Serial.println(incoming.indexOf(ip)); // test print
         if (incoming.indexOf(ip) >= 0) {// and it's broadcasting the right IP, ie. if the IP string occurs somewhere in the incoming string
           Serial.print("Found node with IP ");
           Serial.print(ip);
